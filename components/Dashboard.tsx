@@ -13,11 +13,31 @@ interface DashboardProps {
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ projects, onEdit, onArchive, onDelete, onUpdate }) => {
-  const activeProjects = projects.filter(p => !p.archived).sort((a, b) => {
-    if (!a.deadline) return 1;
-    if (!b.deadline) return -1;
-    return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
-  });
+  
+  // Helper to determine the effective sorting date
+  const getSortDate = (project: Project): number => {
+    // Check for incomplete stages with valid deadlines
+    const incompleteStagesWithDeadlines = project.stages
+      .filter(s => !s.completed && s.deadline)
+      .map(s => new Date(s.deadline).getTime());
+
+    // If there are incomplete stages with deadlines, use the earliest one (Priority)
+    if (incompleteStagesWithDeadlines.length > 0) {
+      return Math.min(...incompleteStagesWithDeadlines);
+    }
+
+    // Otherwise (no incomplete stages with deadlines, or all complete), fallback to project deadline
+    if (project.deadline) {
+      return new Date(project.deadline).getTime();
+    }
+
+    // If no deadline exists at all, push to the end
+    return Number.MAX_SAFE_INTEGER;
+  };
+
+  const activeProjects = projects
+    .filter(p => !p.archived)
+    .sort((a, b) => getSortDate(a) - getSortDate(b));
 
   if (activeProjects.length === 0) {
     return (
