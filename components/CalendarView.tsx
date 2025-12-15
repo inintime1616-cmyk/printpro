@@ -89,7 +89,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ projects, onEdit }) => {
                     <div 
                       key={p.id} 
                       onClick={() => onEdit(p)}
-                      className={`text-[10px] p-1.5 rounded cursor-pointer truncate font-medium transition shadow-sm ${getProjectStyle(p)}`}
+                      className={`text-[11px] p-1.5 rounded cursor-pointer truncate font-medium transition shadow-sm ${getProjectStyle(p)}`}
                     >
                       {p.name}
                     </div>

@@ -58,7 +58,7 @@ const ArchivedView: React.FC<ArchivedViewProps> = ({ projects, onUnarchive, onDe
               <div className="text-xs text-stone-400 mb-4 font-mono">歸檔日期：{project.deadline}</div>
               <div className="flex flex-wrap gap-2">
                 {project.tags.map(tag => (
-                  <span key={tag} className="text-[10px] bg-stone-200 text-stone-500 px-2 py-1 rounded-sm">{tag}</span>
+                  <span key={tag} className="text-[11px] bg-stone-200 text-stone-500 px-2 py-1 rounded-sm">{tag}</span>
                 ))}
               </div>
             </div>

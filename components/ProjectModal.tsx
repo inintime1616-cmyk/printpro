@@ -177,7 +177,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({
 
               {/* Quick Select */}
               <div className="mb-4">
-                 <p className="text-[10px] text-stone-400 mb-2 font-medium tracking-wide">常用標籤庫</p>
+                 <p className="text-[11px] text-stone-400 mb-2 font-medium tracking-wide">常用標籤庫</p>
                  <div className="flex flex-wrap gap-2">
                     {availableTags.map(tag => {
                        const isSelected = formData.tags?.includes(tag);
