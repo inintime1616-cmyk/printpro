@@ -24,7 +24,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onEdit, onArchive, o
 
   const getBorderColor = () => {
     if (projectStatus === '已完成') return 'border-l-emerald-600';
-    if (statusInfo.isOverdue) return 'border-l-stone-400';
+    if (statusInfo.isOverdue) return 'border-l-red-700'; // Dark red for overdue
     if (statusInfo.isUrgent) return 'border-l-red-600';
     return 'border-l-stone-300'; // Neutral default
   };
@@ -63,7 +63,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onEdit, onArchive, o
       </div>
 
       {/* Status Box */}
-      <div className={`mb-5 px-3 py-2 rounded border-l-2 ${statusInfo.colorClass.replace('bg-', 'bg-opacity-40 ')} flex items-center justify-between`}>
+      <div className={`mb-5 px-3 py-2 rounded border-l-2 ${statusInfo.isOverdue ? statusInfo.colorClass : statusInfo.colorClass.replace('bg-', 'bg-opacity-40 ')} flex items-center justify-between`}>
         <div className="text-xs font-medium flex items-center opacity-90">
           <Clock size={13} className="mr-2" />
           <span className="tracking-wider">{project.deadline}</span>

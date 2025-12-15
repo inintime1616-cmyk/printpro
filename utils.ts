@@ -16,8 +16,8 @@ export const getDeadlineStatus = (deadline: string): DateStatus => {
   
   if (diff < 0) {
     return { 
-      text: '已逾期', 
-      colorClass: 'bg-stone-100 text-stone-500 border-stone-200 line-through', // Muted for passed
+      text: '⚠️ 已逾期', 
+      colorClass: 'bg-red-700 text-white border-red-800 font-bold shadow-md', // Striking alert style
       isUrgent: true,
       isOverdue: true
     };
