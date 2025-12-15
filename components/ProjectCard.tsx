@@ -1,7 +1,7 @@
 import React from 'react';
 import { Project } from '../types';
 import { getDeadlineStatus, getProjectStatus, getDiffDays, getTagColorClass } from '../utils';
-import { Clock, Pen, Archive, Trash2, Check, AlertCircle } from 'lucide-react';
+import { Clock, Pen, Archive, Trash2, Check, AlertCircle, Truck, Package } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface ProjectCardProps {
@@ -104,11 +104,21 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onEdit, onArchive, o
 
       {/* Footer */}
       <div className="mt-auto pt-3 border-t border-stone-100 flex justify-between items-center">
-        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold tracking-widest
-          ${projectStatus === '已完成' ? 'bg-emerald-100 text-emerald-700' : 
-            projectStatus === '進行中' ? 'bg-stone-100 text-stone-600' : 'bg-stone-50 text-stone-400'}`}>
-          {projectStatus}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold tracking-widest
+            ${projectStatus === '已完成' ? 'bg-emerald-100 text-emerald-700' : 
+              projectStatus === '進行中' ? 'bg-stone-100 text-stone-600' : 'bg-stone-50 text-stone-400'}`}>
+            {projectStatus}
+          </span>
+          
+          {/* Delivery Method Badge */}
+          {project.deliveryMethod && (
+            <span className="px-2 py-0.5 rounded text-[10px] font-medium tracking-wide bg-stone-50 text-stone-500 border border-stone-200 flex items-center" title="取件方式">
+              {project.deliveryMethod === '宅配' ? <Truck size={10} className="mr-1" /> : <Package size={10} className="mr-1" />}
+              {project.deliveryMethod}
+            </span>
+          )}
+        </div>
         
         {projectStatus === '已完成' && (
           <button 

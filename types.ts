@@ -9,6 +9,7 @@ export interface Project {
   name: string;
   deadline: string;
   tags: string[];
+  deliveryMethod?: '自取' | '宅配';
   archived: boolean;
   stages: Stage[];
 }

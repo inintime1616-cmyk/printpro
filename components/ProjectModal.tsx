@@ -21,6 +21,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({
     name: '',
     deadline: '',
     tags: [],
+    deliveryMethod: undefined,
     stages: [{ name: '階段 1', deadline: '', completed: false }]
   });
   const [customTagInput, setCustomTagInput] = useState('');
@@ -33,6 +34,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({
         name: '',
         deadline: '',
         tags: [],
+        deliveryMethod: undefined,
         stages: [{ name: '階段 1', deadline: '', completed: false }]
       });
     }
@@ -133,6 +135,26 @@ const ProjectModal: React.FC<ProjectModalProps> = ({
                   type="date" 
                   className="w-full rounded-lg border-stone-200 border bg-white px-3 py-2.5 text-stone-800 focus:ring-1 focus:ring-red-800 focus:border-red-800 outline-none transition-all shadow-sm"
                 />
+              </div>
+            </div>
+
+            {/* Delivery Method Selection */}
+            <div>
+              <label className="block text-xs font-bold text-stone-500 uppercase tracking-widest mb-3">取件方式</label>
+              <div className="flex gap-4">
+                {['自取', '宅配'].map((method) => (
+                  <label key={method} className={`flex items-center space-x-2 cursor-pointer px-4 py-2 rounded-lg border transition-all ${formData.deliveryMethod === method ? 'bg-red-50 border-red-800 text-red-900' : 'bg-white border-stone-200 text-stone-600 hover:border-stone-400'}`}>
+                    <input
+                      type="radio"
+                      name="deliveryMethod"
+                      value={method}
+                      checked={formData.deliveryMethod === method}
+                      onChange={() => setFormData(prev => ({ ...prev, deliveryMethod: method as '自取' | '宅配' }))}
+                      className="text-red-800 focus:ring-red-800 accent-red-800"
+                    />
+                    <span className="text-sm font-medium">{method}</span>
+                  </label>
+                ))}
               </div>
             </div>
 
