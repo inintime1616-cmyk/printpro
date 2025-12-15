@@ -1,6 +1,6 @@
 import React from 'react';
 import { ViewType } from '../types';
-import { Printer, Layers, CalendarDays, Hammer, Archive, Plus, Feather } from 'lucide-react';
+import { Printer, Layers, CalendarDays, Hammer, Archive, Plus, Feather, Download, Upload } from 'lucide-react';
 
 interface HeaderProps {
   currentView: ViewType;
@@ -8,9 +8,19 @@ interface HeaderProps {
   onNewProject: () => void;
   title: string;
   onTitleChange: (newTitle: string) => void;
+  onExport: () => void;
+  onImport: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ currentView, onChangeView, onNewProject, title, onTitleChange }) => {
+const Header: React.FC<HeaderProps> = ({ 
+  currentView, 
+  onChangeView, 
+  onNewProject, 
+  title, 
+  onTitleChange,
+  onExport,
+  onImport
+}) => {
   const navItems: { id: ViewType; label: string; icon: React.ReactNode }[] = [
     { id: 'dashboard', label: '進行中', icon: <Layers size={16} /> },
     { id: 'calendar', label: '行事曆', icon: <CalendarDays size={16} /> },
@@ -51,6 +61,30 @@ const Header: React.FC<HeaderProps> = ({ currentView, onChangeView, onNewProject
         </div>
 
         <div className="w-px h-8 bg-stone-200 mx-2 hidden md:block"></div>
+
+        {/* Data Controls */}
+        <div className="flex items-center gap-1">
+          <button 
+            onClick={onExport} 
+            className="p-2.5 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-xl transition" 
+            title="匯出備份資料"
+          >
+            <Download size={18} />
+          </button>
+          <label 
+            className="p-2.5 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-xl transition cursor-pointer" 
+            title="匯入備份資料"
+          >
+            <Upload size={18} />
+            <input 
+              type="file" 
+              accept=".json" 
+              onChange={onImport} 
+              className="hidden" 
+              value=""
+            />
+          </label>
+        </div>
 
         <button 
           onClick={onNewProject} 

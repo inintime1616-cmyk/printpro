@@ -35,7 +35,15 @@ const WorkspaceView: React.FC<WorkspaceViewProps> = ({ projects, onEdit }) => {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8 pb-10">
       {usedTags.map(tag => {
-        const taggedProjects = activeProjects.filter(p => p.tags.includes(tag));
+        // Filter projects by tag and sort by deadline
+        const taggedProjects = activeProjects
+          .filter(p => p.tags.includes(tag))
+          .sort((a, b) => {
+             if (!a.deadline) return 1;
+             if (!b.deadline) return -1;
+             return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
+          });
+
         if (taggedProjects.length === 0) return null;
 
         // Use the same color logic for the section header

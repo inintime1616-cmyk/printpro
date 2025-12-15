@@ -122,6 +122,62 @@ const App: React.FC = () => {
     setProjects(prev => prev.filter(p => !p.archived));
   };
 
+  // Data Management
+  const handleExportData = () => {
+    const data = {
+      projects,
+      availableTags,
+      appTitle,
+      version: '1.0',
+      timestamp: new Date().toISOString()
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `printflow-backup-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportData = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const jsonStr = event.target?.result as string;
+        const data = JSON.parse(jsonStr);
+        
+        // Basic Validation
+        if (!Array.isArray(data.projects)) {
+          alert('錯誤：無效的備份檔案格式 (缺少專案資料)');
+          return;
+        }
+
+        if (window.confirm(`準備匯入包含 ${data.projects.length} 個專案的備份資料。\n\n⚠️ 注意：這將會「完全覆蓋」目前的現有資料！\n\n確定要繼續嗎？`)) {
+          setProjects(data.projects);
+          if (Array.isArray(data.availableTags)) {
+             setAvailableTags(data.availableTags);
+          }
+          if (data.appTitle) {
+             setAppTitle(data.appTitle);
+          }
+          alert('資料匯入成功！');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('匯入失敗：檔案格式錯誤或損毀');
+      } finally {
+        e.target.value = ''; // Reset input
+      }
+    };
+    reader.readAsText(file);
+  };
+
   return (
     <div className="min-h-screen p-4 md:p-8 max-w-7xl mx-auto font-sans text-slate-800">
       <Header 
@@ -130,6 +186,8 @@ const App: React.FC = () => {
         onNewProject={openNewProject}
         title={appTitle}
         onTitleChange={setAppTitle}
+        onExport={handleExportData}
+        onImport={handleImportData}
       />
 
       <main>
