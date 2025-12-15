@@ -14,6 +14,7 @@ const App: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [availableTags, setAvailableTags] = useState<string[]>([]);
+  const [tagColors, setTagColors] = useState<Record<string, string>>({});
 
   // Load data
   useEffect(() => {
@@ -39,6 +40,11 @@ const App: React.FC = () => {
       setAvailableTags(['數位印刷', '燙金', '凸版', 'UV 浮雕', '斬型', '後加工']);
     }
 
+    const savedTagColors = localStorage.getItem('printProjectSystem_tagColors');
+    if (savedTagColors) {
+      setTagColors(JSON.parse(savedTagColors));
+    }
+
     const savedTitle = localStorage.getItem('printProjectSystem_appTitle');
     if (savedTitle) {
       setAppTitle(savedTitle);
@@ -57,6 +63,12 @@ const App: React.FC = () => {
       localStorage.setItem('printProjectSystem_allTags', JSON.stringify(availableTags));
     }
   }, [availableTags]);
+
+  useEffect(() => {
+    if (Object.keys(tagColors).length > 0) {
+      localStorage.setItem('printProjectSystem_tagColors', JSON.stringify(tagColors));
+    }
+  }, [tagColors]);
 
   useEffect(() => {
     localStorage.setItem('printProjectSystem_appTitle', appTitle);
@@ -112,6 +124,10 @@ const App: React.FC = () => {
     }
   };
 
+  const handleSetTagColor = (tag: string, color: string) => {
+    setTagColors(prev => ({ ...prev, [tag]: color }));
+  };
+
   const handleDeleteGlobalTag = (tag: string) => {
      if(window.confirm(`確定要從常用標籤中移除「${tag}」嗎？`)) {
         setAvailableTags(prev => prev.filter(t => t !== tag));
@@ -127,6 +143,7 @@ const App: React.FC = () => {
     const data = {
       projects,
       availableTags,
+      tagColors,
       appTitle,
       version: '1.0',
       timestamp: new Date().toISOString()
@@ -163,6 +180,9 @@ const App: React.FC = () => {
           if (Array.isArray(data.availableTags)) {
              setAvailableTags(data.availableTags);
           }
+          if (data.tagColors) {
+            setTagColors(data.tagColors);
+          }
           if (data.appTitle) {
              setAppTitle(data.appTitle);
           }
@@ -198,13 +218,14 @@ const App: React.FC = () => {
             onArchive={handleToggleArchive} 
             onDelete={handleDeleteProject}
             onUpdate={handleUpdateProject}
+            tagColors={tagColors}
           />
         )}
         {currentView === 'calendar' && (
-          <CalendarView projects={projects} onEdit={openEditProject} />
+          <CalendarView projects={projects} onEdit={openEditProject} tagColors={tagColors} />
         )}
         {currentView === 'workspace' && (
-          <WorkspaceView projects={projects} onEdit={openEditProject} />
+          <WorkspaceView projects={projects} onEdit={openEditProject} tagColors={tagColors} />
         )}
         {currentView === 'archived' && (
           <ArchivedView 
@@ -212,6 +233,7 @@ const App: React.FC = () => {
             onUnarchive={handleToggleArchive} 
             onDelete={handleDeleteProject}
             onClearAll={handleClearArchived}
+            tagColors={tagColors}
           />
         )}
       </main>
@@ -224,6 +246,8 @@ const App: React.FC = () => {
         availableTags={availableTags}
         onAddGlobalTag={handleAddGlobalTag}
         onDeleteGlobalTag={handleDeleteGlobalTag}
+        tagColors={tagColors}
+        onSetTagColor={handleSetTagColor}
       />
     </div>
   );

@@ -62,7 +62,7 @@ export const getCurrentStageName = (project: Project): string => {
 };
 
 // Expanded Japanese Traditional Color Palette for Tags (Unique Colors)
-const TAG_PALETTE = [
+export const TAG_PALETTE = [
   // Reds / Pinks
   'bg-[#fdeff2] text-[#5e3023] border-[#e9cbd1]', // Sakura-iro
   'bg-[#f0908d] text-[#592a29] border-[#d67b78]', // Toki-garacha
@@ -122,7 +122,10 @@ const TAG_PALETTE = [
   'bg-[#c8c2be] text-[#4d4845] border-[#b3ada9]', // Subako
 ];
 
-export const getTagColorClass = (tagName: string): string => {
+export const getTagColorClass = (tagName: string, colorMap?: Record<string, string>): string => {
+  if (colorMap && colorMap[tagName]) {
+    return colorMap[tagName];
+  }
   let hash = 0;
   for (let i = 0; i < tagName.length; i++) {
     hash = tagName.charCodeAt(i) + ((hash << 5) - hash);

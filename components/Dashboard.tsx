@@ -10,9 +10,10 @@ interface DashboardProps {
   onArchive: (p: Project) => void;
   onDelete: (id: number) => void;
   onUpdate: (p: Project) => void;
+  tagColors: Record<string, string>;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ projects, onEdit, onArchive, onDelete, onUpdate }) => {
+const Dashboard: React.FC<DashboardProps> = ({ projects, onEdit, onArchive, onDelete, onUpdate, tagColors }) => {
   
   // Helper to determine the effective sorting date
   const getSortDate = (project: Project): number => {
@@ -61,6 +62,7 @@ const Dashboard: React.FC<DashboardProps> = ({ projects, onEdit, onArchive, onDe
           onArchive={onArchive}
           onDelete={onDelete}
           onUpdate={onUpdate}
+          tagColors={tagColors}
         />
       ))}
     </div>

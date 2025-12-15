@@ -7,9 +7,10 @@ import { motion } from 'framer-motion';
 interface CalendarViewProps {
   projects: Project[];
   onEdit: (p: Project) => void;
+  tagColors: Record<string, string>;
 }
 
-const CalendarView: React.FC<CalendarViewProps> = ({ projects, onEdit }) => {
+const CalendarView: React.FC<CalendarViewProps> = ({ projects, onEdit, tagColors }) => {
   const [year, setYear] = useState(new Date().getFullYear());
   const [month, setMonth] = useState(new Date().getMonth());
 
@@ -43,7 +44,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ projects, onEdit }) => {
   const getProjectStyle = (p: Project) => {
     // Use the first tag color if available, otherwise default
     if (p.tags.length > 0) {
-        return `${getTagColorClass(p.tags[0])} hover:brightness-95`;
+        return `${getTagColorClass(p.tags[0], tagColors)} hover:brightness-95`;
     }
     return 'bg-stone-100 text-stone-600 border border-stone-200 hover:bg-stone-200';
   };
@@ -55,11 +56,11 @@ const CalendarView: React.FC<CalendarViewProps> = ({ projects, onEdit }) => {
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
       {/* Header */}
       <div className="flex justify-between items-center bg-white p-5 rounded-xl shadow-sm border border-stone-100">
-        <button onClick={() => changeMonth(-1)} className="flex items-center text-stone-500 hover:bg-stone-50 px-3 py-1.5 rounded-lg transition">
+        <button onClick={() => changeMonth(-1)} className="flex items-center text-stone-500 hover:bg-stone-50 px-3 py-1.5 rounded-lg transition text-[13.5px]">
           <ChevronLeft size={18} className="mr-1" /> 上個月
         </button>
         <h2 className="text-xl font-bold text-stone-800 tabular-nums font-serif tracking-widest">{year} 年 {month + 1} 月</h2>
-        <button onClick={() => changeMonth(1)} className="flex items-center text-stone-500 hover:bg-stone-50 px-3 py-1.5 rounded-lg transition">
+        <button onClick={() => changeMonth(1)} className="flex items-center text-stone-500 hover:bg-stone-50 px-3 py-1.5 rounded-lg transition text-[13.5px]">
           下個月 <ChevronRight size={18} className="ml-1" />
         </button>
       </div>
@@ -68,7 +69,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ projects, onEdit }) => {
       <div className="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden">
         <div className="grid grid-cols-7 text-center border-b border-stone-200 bg-stone-50">
           {['日', '一', '二', '三', '四', '五', '六'].map((d, i) => (
-            <div key={d} className={`py-4 font-bold text-sm ${i === 0 || i === 6 ? 'text-red-800' : 'text-stone-600'}`}>{d}</div>
+            <div key={d} className={`py-4 font-bold text-[13.5px] ${i === 0 || i === 6 ? 'text-red-800' : 'text-stone-600'}`}>{d}</div>
           ))}
         </div>
         
@@ -89,7 +90,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ projects, onEdit }) => {
                     <div 
                       key={p.id} 
                       onClick={() => onEdit(p)}
-                      className={`text-[11px] p-1.5 rounded cursor-pointer truncate font-medium transition shadow-sm ${getProjectStyle(p)}`}
+                      className={`text-[13.5px] p-1.5 rounded cursor-pointer truncate font-medium transition shadow-sm ${getProjectStyle(p)}`}
                     >
                       {p.name}
                     </div>
@@ -101,7 +102,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ projects, onEdit }) => {
         </div>
       </div>
       
-      <div className="text-center text-stone-400 text-sm font-light">
+      <div className="text-center text-stone-400 text-[13.5px] font-light">
         提示：月曆僅顯示「進行中」且截止日在當月的專案。
       </div>
     </motion.div>

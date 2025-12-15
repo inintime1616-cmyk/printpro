@@ -7,9 +7,10 @@ import { motion } from 'framer-motion';
 interface WorkspaceViewProps {
   projects: Project[];
   onEdit: (p: Project) => void;
+  tagColors: Record<string, string>;
 }
 
-const WorkspaceView: React.FC<WorkspaceViewProps> = ({ projects, onEdit }) => {
+const WorkspaceView: React.FC<WorkspaceViewProps> = ({ projects, onEdit, tagColors }) => {
   const activeProjects = projects.filter(p => !p.archived);
 
   // Helper to find the earliest deadline timestamp for a specific tag
@@ -43,9 +44,9 @@ const WorkspaceView: React.FC<WorkspaceViewProps> = ({ projects, onEdit }) => {
   const getStatusBadge = (p: Project) => {
     const s = getProjectStatus(p);
     // Custom minimal badges
-    if (s === '已完成') return <span className="text-emerald-600 font-medium text-xs border border-emerald-200 px-2 py-0.5 rounded-sm bg-emerald-50">完成</span>;
-    if (s === '進行中') return <span className="text-stone-600 font-medium text-xs border border-stone-200 px-2 py-0.5 rounded-sm bg-stone-50">進行</span>;
-    return <span className="text-stone-400 font-medium text-xs">--</span>;
+    if (s === '已完成') return <span className="text-emerald-600 font-medium text-[13.5px] border border-emerald-200 px-2 py-0.5 rounded-sm bg-emerald-50">完成</span>;
+    if (s === '進行中') return <span className="text-stone-600 font-medium text-[13.5px] border border-stone-200 px-2 py-0.5 rounded-sm bg-stone-50">進行</span>;
+    return <span className="text-stone-400 font-medium text-[13.5px]">--</span>;
   };
 
   if (usedTags.length === 0) {
@@ -67,7 +68,7 @@ const WorkspaceView: React.FC<WorkspaceViewProps> = ({ projects, onEdit }) => {
         if (taggedProjects.length === 0) return null;
 
         // Use the same color logic for the section header
-        const colorClass = getTagColorClass(tag); 
+        const colorClass = getTagColorClass(tag, tagColors); 
         // Extract border color to use as accent line
         const borderColor = colorClass.split(' ').find(c => c.startsWith('border-'))?.replace('border-', '') || 'stone-200';
 
@@ -80,12 +81,12 @@ const WorkspaceView: React.FC<WorkspaceViewProps> = ({ projects, onEdit }) => {
                  </span>
                  <h2 className="text-lg font-bold text-stone-800 tracking-wide font-serif">{tag}</h2>
               </div>
-              <span className="text-xs text-stone-400 font-mono">COUNT: {taggedProjects.length}</span>
+              <span className="text-[13.5px] text-stone-400 font-mono">COUNT: {taggedProjects.length}</span>
             </div>
             
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm whitespace-nowrap">
-                <thead className="text-stone-400 border-b border-stone-100 text-xs uppercase tracking-wider">
+                <thead className="text-stone-400 border-b border-stone-100 text-[13.5px] uppercase tracking-wider">
                   <tr>
                     <th className="px-6 py-4 font-normal w-1/3">Project</th>
                     <th className="px-6 py-4 font-normal">Current Stage</th>
@@ -102,10 +103,10 @@ const WorkspaceView: React.FC<WorkspaceViewProps> = ({ projects, onEdit }) => {
                         onClick={() => onEdit(project)}
                         className="hover:bg-red-50/30 cursor-pointer transition-colors group"
                       >
-                        <td className="px-6 py-4 font-medium text-stone-700 group-hover:text-red-800 transition-colors">
+                        <td className="px-6 py-4 font-medium text-stone-700 group-hover:text-red-800 transition-colors text-[13.5px]">
                             {project.name}
                         </td>
-                        <td className="px-6 py-4 text-stone-600 font-medium flex items-center h-full">
+                        <td className="px-6 py-4 text-stone-600 font-medium flex items-center h-full text-[13.5px]">
                           {currentStage !== '已完成' && (
                              <MapPin size={14} className="mr-2 text-red-800 opacity-80" fill="currentColor" />
                           )}
@@ -115,7 +116,7 @@ const WorkspaceView: React.FC<WorkspaceViewProps> = ({ projects, onEdit }) => {
                           {currentStage}
                         </td>
                         <td className="px-6 py-4">
-                          <span className={`${getDeadlineClass(project.deadline)} font-mono text-xs`}>{project.deadline}</span>
+                          <span className={`${getDeadlineClass(project.deadline)} font-mono text-[13.5px]`}>{project.deadline}</span>
                         </td>
                         <td className="px-6 py-4 text-right">{getStatusBadge(project)}</td>
                       </tr>

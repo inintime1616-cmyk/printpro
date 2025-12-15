@@ -10,9 +10,10 @@ interface ProjectCardProps {
   onArchive: (project: Project) => void;
   onDelete: (id: number) => void;
   onUpdate: (project: Project) => void;
+  tagColors: Record<string, string>;
 }
 
-const ProjectCard: React.FC<ProjectCardProps> = ({ project, onEdit, onArchive, onDelete, onUpdate }) => {
+const ProjectCard: React.FC<ProjectCardProps> = ({ project, onEdit, onArchive, onDelete, onUpdate, tagColors }) => {
   const statusInfo = getDeadlineStatus(project.deadline);
   const projectStatus = getProjectStatus(project);
 
@@ -56,7 +57,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onEdit, onArchive, o
       {/* Tags with Exclusive Colors */}
       <div className="flex flex-wrap gap-2 mb-5">
         {project.tags.map(tag => (
-          <span key={tag} className={`text-[11px] px-2.5 py-1 rounded border ${getTagColorClass(tag)} font-medium tracking-wide`}>
+          <span key={tag} className={`text-[13.5px] px-2.5 py-1 rounded border ${getTagColorClass(tag, tagColors)} font-medium tracking-wide`}>
             {tag}
           </span>
         ))}
@@ -64,11 +65,11 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onEdit, onArchive, o
 
       {/* Status Box */}
       <div className={`mb-5 px-3 py-2 rounded border-l-2 ${statusInfo.isOverdue ? statusInfo.colorClass : statusInfo.colorClass.replace('bg-', 'bg-opacity-40 ')} flex items-center justify-between`}>
-        <div className="text-xs font-medium flex items-center opacity-90">
-          <Clock size={13} className="mr-2" />
+        <div className="text-[13.5px] font-medium flex items-center opacity-90">
+          <Clock size={14} className="mr-2" />
           <span className="tracking-wider">{project.deadline}</span>
         </div>
-        <div className="text-xs font-bold">{statusInfo.text}</div>
+        <div className="text-[13.5px] font-bold">{statusInfo.text}</div>
       </div>
 
       {/* Stages */}
@@ -77,7 +78,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onEdit, onArchive, o
           const isUrgent = !stage.completed && stage.deadline && getDiffDays(stage.deadline) <= 3;
           
           return (
-            <div key={idx} className="flex items-start justify-between text-sm py-1 group/stage">
+            <div key={idx} className="flex items-start justify-between py-1 group/stage">
               <label className="flex items-center w-8/12 cursor-pointer">
                 <div className={`w-4 h-4 rounded border flex items-center justify-center mr-2.5 transition-colors duration-300 ${stage.completed ? 'bg-red-800 border-red-800' : 'bg-white border-stone-300 hover:border-red-400'}`}>
                     {stage.completed && <Check size={10} className="text-white" />}
@@ -88,13 +89,13 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onEdit, onArchive, o
                   onChange={() => handleStageToggle(idx)}
                   className="hidden"
                 />
-                <span className={`break-all text-[13px] leading-tight transition-all duration-300 ${stage.completed ? 'line-through text-stone-300' : 'text-stone-600 font-medium'}`}>
+                <span className={`break-all text-[13.5px] leading-tight transition-all duration-300 ${stage.completed ? 'line-through text-stone-300' : 'text-stone-600 font-medium'}`}>
                   {stage.name}
                 </span>
               </label>
               
-              <div className={`text-[11px] whitespace-nowrap flex items-center justify-end w-4/12 ${isUrgent ? 'text-red-600 font-bold' : 'text-stone-300'}`}>
-                {isUrgent && <AlertCircle size={11} className="mr-1 fill-red-50" />}
+              <div className={`text-[13.5px] whitespace-nowrap flex items-center justify-end w-4/12 ${isUrgent ? 'text-red-600 font-bold' : 'text-stone-300'}`}>
+                {isUrgent && <AlertCircle size={12} className="mr-1 fill-red-50" />}
                 {stage.deadline}
               </div>
             </div>
@@ -105,7 +106,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onEdit, onArchive, o
       {/* Footer */}
       <div className="mt-auto pt-3 border-t border-stone-100 flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold tracking-widest
+          <span className={`px-2.5 py-1 rounded-full text-[13.5px] font-bold tracking-widest
             ${projectStatus === '已完成' ? 'bg-emerald-100 text-emerald-700' : 
               projectStatus === '進行中' ? 'bg-stone-100 text-stone-600' : 'bg-stone-50 text-stone-400'}`}>
             {projectStatus}
@@ -113,8 +114,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onEdit, onArchive, o
           
           {/* Delivery Method Badge */}
           {project.deliveryMethod && (
-            <span className="px-2 py-0.5 rounded text-[11px] font-medium tracking-wide bg-stone-50 text-stone-500 border border-stone-200 flex items-center" title="取件方式">
-              {project.deliveryMethod === '宅配' ? <Truck size={10} className="mr-1" /> : <Package size={10} className="mr-1" />}
+            <span className="px-2 py-0.5 rounded text-[13.5px] font-medium tracking-wide bg-stone-50 text-stone-500 border border-stone-200 flex items-center" title="取件方式">
+              {project.deliveryMethod === '宅配' ? <Truck size={12} className="mr-1" /> : <Package size={12} className="mr-1" />}
               {project.deliveryMethod}
             </span>
           )}
@@ -123,9 +124,9 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onEdit, onArchive, o
         {projectStatus === '已完成' && (
           <button 
             onClick={() => onArchive(project)} 
-            className="flex items-center bg-stone-800 text-white text-[11px] px-3 py-1.5 rounded hover:bg-stone-700 transition shadow-sm hover:shadow active:scale-95"
+            className="flex items-center bg-stone-800 text-white text-[13.5px] px-3 py-1.5 rounded hover:bg-stone-700 transition shadow-sm hover:shadow active:scale-95"
           >
-            <Archive size={12} className="mr-1.5" />
+            <Archive size={14} className="mr-1.5" />
             歸檔
           </button>
         )}

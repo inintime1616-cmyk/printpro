@@ -8,15 +8,16 @@ interface ArchivedViewProps {
   onUnarchive: (p: Project) => void;
   onDelete: (id: number) => void;
   onClearAll: () => void;
+  tagColors: Record<string, string>;
 }
 
-const ArchivedView: React.FC<ArchivedViewProps> = ({ projects, onUnarchive, onDelete, onClearAll }) => {
+const ArchivedView: React.FC<ArchivedViewProps> = ({ projects, onUnarchive, onDelete, onClearAll, tagColors }) => {
   const archivedProjects = projects.filter(p => p.archived).sort((a, b) => new Date(b.deadline).getTime() - new Date(a.deadline).getTime());
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
       <div className="flex justify-between items-center bg-stone-100 p-4 rounded-xl border border-stone-200">
-        <div className="text-stone-600 text-sm flex items-center">
+        <div className="text-stone-600 text-[13.5px] flex items-center">
           <Info size={16} className="mr-2 text-stone-500" />
           已結案的歷史專案。
         </div>
@@ -27,7 +28,7 @@ const ArchivedView: React.FC<ArchivedViewProps> = ({ projects, onUnarchive, onDe
                 onClearAll();
               }
             }}
-            className="bg-stone-600 text-white text-xs px-4 py-2 rounded-lg hover:bg-stone-700 transition shadow flex items-center"
+            className="bg-stone-600 text-white text-[13.5px] px-4 py-2 rounded-lg hover:bg-stone-700 transition shadow flex items-center"
           >
             <Trash2 size={14} className="mr-1.5" />
             清空歸檔
@@ -38,7 +39,7 @@ const ArchivedView: React.FC<ArchivedViewProps> = ({ projects, onUnarchive, onDe
       {archivedProjects.length === 0 ? (
         <div className="text-center py-20 text-stone-300">
           <PackageOpen size={64} className="mx-auto mb-4 stroke-[1]" />
-          <p className="font-light">目前沒有已歸檔的專案。</p>
+          <p className="font-light text-[15px]">目前沒有已歸檔的專案。</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -55,10 +56,10 @@ const ArchivedView: React.FC<ArchivedViewProps> = ({ projects, onUnarchive, onDe
                   </button>
                 </div>
               </div>
-              <div className="text-xs text-stone-400 mb-4 font-mono">歸檔日期：{project.deadline}</div>
+              <div className="text-[13.5px] text-stone-400 mb-4 font-mono">歸檔日期：{project.deadline}</div>
               <div className="flex flex-wrap gap-2">
                 {project.tags.map(tag => (
-                  <span key={tag} className="text-[11px] bg-stone-200 text-stone-500 px-2 py-1 rounded-sm">{tag}</span>
+                  <span key={tag} className="text-[13.5px] bg-stone-200 text-stone-500 px-2 py-1 rounded-sm">{tag}</span>
                 ))}
               </div>
             </div>
