@@ -36,9 +36,19 @@ const CalendarView: React.FC<CalendarViewProps> = ({ projects, onEdit, tagColors
     return day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
   };
 
+  const getProjectDisplayDate = (p: Project): string => {
+    // 1. Priority: Current active stage (first incomplete stage with a deadline)
+    const activeStage = p.stages?.find(s => !s.completed && s.deadline);
+    if (activeStage) {
+      return activeStage.deadline;
+    }
+    // 2. Fallback: Project deadline (if all stages complete or no stages/deadlines)
+    return p.deadline;
+  };
+
   const getProjectsForDate = (day: number) => {
     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    return projects.filter(p => !p.archived && p.deadline === dateStr);
+    return projects.filter(p => !p.archived && getProjectDisplayDate(p) === dateStr);
   };
 
   const getProjectStyle = (p: Project) => {
@@ -103,7 +113,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ projects, onEdit, tagColors
       </div>
       
       <div className="text-center text-stone-400 text-[13.5px] font-light">
-        提示：月曆僅顯示「進行中」且截止日在當月的專案。
+        提示：月曆僅顯示「進行中」的專案。日期位置以目前進行中的階段截止日為準，若無階段則以總截止日為準。
       </div>
     </motion.div>
   );
