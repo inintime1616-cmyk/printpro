@@ -11,7 +11,27 @@ interface WorkspaceViewProps {
 
 const WorkspaceView: React.FC<WorkspaceViewProps> = ({ projects, onEdit }) => {
   const activeProjects = projects.filter(p => !p.archived);
-  const usedTags = Array.from(new Set<string>(activeProjects.flatMap(p => p.tags))).sort();
+
+  // Helper to find the earliest deadline timestamp for a specific tag
+  const getEarliestDeadlineForTag = (tag: string) => {
+    const relevantProjects = activeProjects.filter(p => p.tags.includes(tag) && p.deadline);
+    if (relevantProjects.length === 0) return Number.MAX_SAFE_INTEGER;
+    
+    const timestamps = relevantProjects.map(p => new Date(p.deadline).getTime());
+    return Math.min(...timestamps);
+  };
+
+  // Sort tags based on urgency of projects within them
+  const usedTags = Array.from(new Set<string>(activeProjects.flatMap(p => p.tags)))
+    .sort((a, b) => {
+      const timeA = getEarliestDeadlineForTag(a);
+      const timeB = getEarliestDeadlineForTag(b);
+      
+      if (timeA !== timeB) {
+        return timeA - timeB;
+      }
+      return a.localeCompare(b);
+    });
 
   const getDeadlineClass = (deadline: string) => {
     const diff = getDiffDays(deadline);
