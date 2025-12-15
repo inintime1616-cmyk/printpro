@@ -132,7 +132,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({
                   value={formData.name} 
                   onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
                   type="text" 
-                  className="w-full rounded-lg border-stone-200 border bg-white px-3 py-2.5 text-stone-800 focus:ring-1 focus:ring-red-800 focus:border-red-800 outline-none transition-all shadow-sm text-[13.5px]"
+                  className="w-full rounded-lg border-stone-200 border bg-white px-3 py-2.5 text-stone-800 focus:ring-1 focus:ring-red-800 focus:border-red-800 outline-none transition-all shadow-sm text-base"
                   placeholder="例如：2024 春季型錄"
                 />
               </div>
@@ -142,7 +142,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({
                   value={formData.deadline} 
                   onChange={e => setFormData(prev => ({ ...prev, deadline: e.target.value }))}
                   type="date" 
-                  className="w-full rounded-lg border-stone-200 border bg-white px-3 py-2.5 text-stone-800 focus:ring-1 focus:ring-red-800 focus:border-red-800 outline-none transition-all shadow-sm text-[13.5px]"
+                  className="w-full rounded-lg border-stone-200 border bg-white px-3 py-2.5 text-stone-800 focus:ring-1 focus:ring-red-800 focus:border-red-800 outline-none transition-all shadow-sm text-base"
                 />
               </div>
             </div>
