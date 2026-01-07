@@ -49,10 +49,8 @@ const WorkspaceView: React.FC<WorkspaceViewProps> = ({ projects, onEdit, tagColo
        return <span className="text-indigo-600 font-medium text-[13.5px] border border-indigo-200 px-2 py-0.5 rounded-sm bg-indigo-50">印製中</span>;
     }
 
-    const s = getProjectStatus(p);
-    // Custom minimal badges
-    if (s === '進行中') return <span className="text-stone-600 font-medium text-[13.5px] border border-stone-200 px-2 py-0.5 rounded-sm bg-stone-50">進行</span>;
-    return <span className="text-stone-400 font-medium text-[13.5px]">--</span>;
+    // Has incomplete stages
+    return <span className="text-stone-600 font-medium text-[13.5px] border border-stone-200 px-2 py-0.5 rounded-sm bg-stone-50">請確認印刷狀態</span>;
   };
 
   if (usedTags.length === 0) {
