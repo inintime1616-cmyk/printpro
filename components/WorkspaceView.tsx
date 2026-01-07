@@ -1,7 +1,7 @@
 import React from 'react';
 import { Project } from '../types';
 import { getCurrentStageName, getProjectStatus, getDiffDays, getTagColorClass } from '../utils';
-import { Tag, MapPin, CheckCircle2 } from 'lucide-react';
+import { Tag, MapPin, Printer } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface WorkspaceViewProps {
@@ -42,9 +42,15 @@ const WorkspaceView: React.FC<WorkspaceViewProps> = ({ projects, onEdit, tagColo
   };
 
   const getStatusBadge = (p: Project) => {
+    // "Printing" condition: No stages OR All stages completed
+    const isPrinting = !p.stages || p.stages.length === 0 || p.stages.every(s => s.completed);
+
+    if (isPrinting) {
+       return <span className="text-indigo-600 font-medium text-[13.5px] border border-indigo-200 px-2 py-0.5 rounded-sm bg-indigo-50">印製中</span>;
+    }
+
     const s = getProjectStatus(p);
     // Custom minimal badges
-    if (s === '已完成') return <span className="text-emerald-600 font-medium text-[13.5px] border border-emerald-200 px-2 py-0.5 rounded-sm bg-emerald-50">完成</span>;
     if (s === '進行中') return <span className="text-stone-600 font-medium text-[13.5px] border border-stone-200 px-2 py-0.5 rounded-sm bg-stone-50">進行</span>;
     return <span className="text-stone-400 font-medium text-[13.5px]">--</span>;
   };
@@ -96,7 +102,10 @@ const WorkspaceView: React.FC<WorkspaceViewProps> = ({ projects, onEdit, tagColo
                 </thead>
                 <tbody className="divide-y divide-stone-50">
                   {taggedProjects.map(project => {
-                    const currentStage = getCurrentStageName(project);
+                    // Check for "Printing" condition
+                    const isPrinting = !project.stages || project.stages.length === 0 || project.stages.every(s => s.completed);
+                    const displayStage = isPrinting ? '印製中' : getCurrentStageName(project);
+
                     return (
                       <tr 
                         key={project.id} 
@@ -107,13 +116,12 @@ const WorkspaceView: React.FC<WorkspaceViewProps> = ({ projects, onEdit, tagColo
                             {project.name}
                         </td>
                         <td className="px-6 py-4 text-stone-600 font-medium flex items-center h-full text-[13.5px]">
-                          {currentStage !== '已完成' && (
+                          {isPrinting ? (
+                             <Printer size={14} className="mr-2 text-indigo-600 opacity-80" />
+                          ) : (
                              <MapPin size={14} className="mr-2 text-red-800 opacity-80" fill="currentColor" />
                           )}
-                          {currentStage === '已完成' && (
-                             <CheckCircle2 size={14} className="mr-2 text-emerald-500" />
-                          )}
-                          {currentStage}
+                          {displayStage}
                         </td>
                         <td className="px-6 py-4">
                           <span className={`${getDeadlineClass(project.deadline)} font-mono text-[13.5px]`}>{project.deadline}</span>
