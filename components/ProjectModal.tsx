@@ -24,6 +24,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({
     deadline: '',
     tags: [],
     deliveryMethod: undefined,
+    notes: '',
     stages: [{ name: '階段 1', deadline: '', completed: false }]
   });
   const [customTagInput, setCustomTagInput] = useState('');
@@ -39,6 +40,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({
         deadline: '',
         tags: [],
         deliveryMethod: undefined,
+        notes: '',
         stages: [{ name: '階段 1', deadline: '', completed: false }]
       });
     }
@@ -253,6 +255,17 @@ const ProjectModal: React.FC<ProjectModalProps> = ({
                    </motion.div>
                 )}
               </div>
+            </div>
+
+            {/* Notes Section (New) */}
+            <div>
+              <label className="block text-sm font-bold text-stone-500 uppercase tracking-widest mb-2">備註事項</label>
+              <textarea 
+                  value={formData.notes || ''} 
+                  onChange={e => setFormData(prev => ({ ...prev, notes: e.target.value }))}
+                  className="w-full rounded-lg border-stone-200 border bg-white px-3 py-2.5 text-stone-800 focus:ring-1 focus:ring-red-800 outline-none transition-all shadow-sm text-[13.5px] min-h-[80px]"
+                  placeholder="選填：填寫專案相關備註..."
+              />
             </div>
 
             {/* Stages Section */}

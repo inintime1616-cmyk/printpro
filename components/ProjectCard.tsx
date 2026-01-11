@@ -1,7 +1,7 @@
 import React from 'react';
 import { Project } from '../types';
 import { getDeadlineStatus, getProjectStatus, getDiffDays, getTagColorClass } from '../utils';
-import { Clock, Pen, Archive, Trash2, Check, AlertCircle, Truck, Package } from 'lucide-react';
+import { Clock, Pen, Archive, Trash2, Check, AlertCircle, Truck, Package, StickyNote } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface ProjectCardProps {
@@ -71,6 +71,19 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onEdit, onArchive, o
         </div>
         <div className="text-[13.5px] font-bold">{statusInfo.text}</div>
       </div>
+
+      {/* Notes Section - Refined Design */}
+      {project.notes && (
+        <div className="mb-5 pl-3 border-l-2 border-stone-100 py-0.5 group/note hover:border-stone-200 transition-colors">
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <StickyNote size={12} className="text-stone-400" />
+            <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider">備註</span>
+          </div>
+          <p className="text-[13.5px] text-stone-600 leading-relaxed whitespace-pre-wrap">
+            {project.notes}
+          </p>
+        </div>
+      )}
 
       {/* Stages */}
       <div className="space-y-1.5 mb-5">
