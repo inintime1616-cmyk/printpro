@@ -119,11 +119,13 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onEdit, onArchive, o
       {/* Footer */}
       <div className="mt-auto pt-3 border-t border-stone-100 flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <span className={`px-2.5 py-1 rounded-full text-[13.5px] font-bold tracking-widest
-            ${projectStatus === '已完成' ? 'bg-emerald-100 text-emerald-700' : 
-              projectStatus === '進行中' ? 'bg-stone-100 text-stone-600' : 'bg-stone-50 text-stone-400'}`}>
-            {projectStatus}
-          </span>
+          {projectStatus !== '未規劃' && (
+            <span className={`px-2.5 py-1 rounded-full text-[13.5px] font-bold tracking-widest
+              ${projectStatus === '已完成' ? 'bg-emerald-100 text-emerald-700' : 
+                projectStatus === '進行中' ? 'bg-stone-100 text-stone-600' : 'bg-stone-50 text-stone-400'}`}>
+              {projectStatus}
+            </span>
+          )}
           
           {/* Delivery Method Badge */}
           {project.deliveryMethod && (
