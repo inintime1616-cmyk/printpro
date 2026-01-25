@@ -236,8 +236,6 @@ const ProjectModal: React.FC<ProjectModalProps> = ({
                         <p className="text-xs text-stone-400 mb-2 font-bold uppercase tracking-wider">選擇標籤顏色</p>
                         <div className="flex flex-wrap gap-2">
                            {TAG_PALETTE.map((colorClass) => {
-                             // Extract bg color roughly for the circle, or just use the class
-                             // We'll render a small div with the class style
                              return (
                                <button 
                                  key={colorClass}
@@ -257,7 +255,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({
               </div>
             </div>
 
-            {/* Notes Section (New) */}
+            {/* Notes Section */}
             <div>
               <label className="block text-sm font-bold text-stone-500 uppercase tracking-widest mb-2">備註事項</label>
               <textarea 
@@ -276,28 +274,49 @@ const ProjectModal: React.FC<ProjectModalProps> = ({
                   <Plus size={14} className="mr-1" /> 新增階段
                 </button>
               </div>
-              <div className="space-y-2.5">
-                {formData.stages?.map((stage, idx) => (
-                  <div key={idx} className="flex items-center gap-3 group">
-                    <div className="w-6 text-center text-stone-300 text-[13.5px] font-mono">{idx + 1}</div>
-                    <input 
-                      type="text" 
-                      value={stage.name} 
-                      onChange={e => handleStageChange(idx, 'name', e.target.value)}
-                      className="flex-1 rounded-md border-stone-200 border p-2 text-[13.5px] focus:border-red-800 focus:ring-1 focus:ring-red-800 outline-none bg-white"
-                      placeholder="階段名稱"
-                    />
-                    <input 
-                      type="date" 
-                      value={stage.deadline} 
-                      onChange={e => handleStageChange(idx, 'deadline', e.target.value)}
-                      className="w-36 rounded-md border-stone-200 border p-2 text-[13.5px] focus:border-red-800 focus:ring-1 focus:ring-red-800 outline-none text-stone-600 bg-white"
-                    />
-                    <button onClick={() => removeStage(idx)} className="text-stone-300 hover:text-red-500 p-2 transition opacity-0 group-hover:opacity-100">
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                ))}
+              <div className="space-y-3">
+                {formData.stages?.map((stage, idx) => {
+                  const stageTagColor = stage.tag ? getTagColorClass(stage.tag, tagColors) : '';
+                  
+                  return (
+                    <div key={idx} className="flex flex-col sm:flex-row items-start sm:items-center gap-2 p-2 rounded-lg bg-stone-50 border border-stone-100 group hover:border-stone-200 transition-colors">
+                      <div className="flex items-center gap-2 w-full sm:w-auto flex-1">
+                          <div className="w-6 text-center text-stone-300 text-[13.5px] font-mono shrink-0">{idx + 1}</div>
+                          <input 
+                            type="text" 
+                            value={stage.name} 
+                            onChange={e => handleStageChange(idx, 'name', e.target.value)}
+                            className="flex-1 min-w-[120px] rounded-md border-stone-200 border p-2 text-[13.5px] focus:border-red-800 focus:ring-1 focus:ring-red-800 outline-none bg-white"
+                            placeholder="階段名稱"
+                          />
+                      </div>
+
+                      <div className="flex items-center gap-2 w-full sm:w-auto">
+                        {/* Stage Tag Selector */}
+                        <select
+                          value={stage.tag || ''}
+                          onChange={e => handleStageChange(idx, 'tag', e.target.value)}
+                          className={`w-full sm:w-32 rounded-md border p-2 text-[12px] font-medium focus:ring-1 focus:ring-red-800 outline-none appearance-none cursor-pointer ${stage.tag ? stageTagColor : 'bg-white border-stone-200 text-stone-500'}`}
+                        >
+                          <option value="" className="bg-white text-stone-500">無標籤</option>
+                          {availableTags.map(tag => (
+                            <option key={tag} value={tag} className="bg-white text-stone-800">{tag}</option>
+                          ))}
+                        </select>
+
+                        <input 
+                          type="date" 
+                          value={stage.deadline} 
+                          onChange={e => handleStageChange(idx, 'deadline', e.target.value)}
+                          className="w-full sm:w-36 rounded-md border-stone-200 border p-2 text-[13.5px] focus:border-red-800 focus:ring-1 focus:ring-red-800 outline-none text-stone-600 bg-white"
+                        />
+                        <button onClick={() => removeStage(idx)} className="text-stone-300 hover:text-red-500 p-2 transition shrink-0">
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>

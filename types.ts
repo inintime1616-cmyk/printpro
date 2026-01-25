@@ -2,6 +2,7 @@ export interface Stage {
   name: string;
   deadline: string;
   completed: boolean;
+  tag?: string;
 }
 
 export interface Project {
