@@ -8,19 +8,6 @@ interface MemoViewProps {
   onUpdateMemos: (memos: Memo[]) => void;
 }
 
-const FONT_SIZES = [
-  'text-xs',    // 0
-  'text-sm',    // 1
-  'text-base',  // 2 (Default)
-  'text-lg',    // 3
-  'text-xl',    // 4
-  'text-2xl',   // 5
-  'text-3xl',   // 6
-  'text-4xl',   // 7
-  'text-5xl',   // 8
-  'text-6xl'    // 9
-];
-
 const HIGHLIGHT_COLORS = [
   { label: '無', color: 'transparent', border: 'border-stone-200' },
   { label: '藤黄', color: '#fcd575', border: 'border-yellow-200' }, // Yellow
@@ -164,11 +151,33 @@ const MemoView: React.FC<MemoViewProps> = ({ initialMemos, onUpdateMemos }) => {
     }
   };
 
-  const changeFontSize = (index: number) => {
-    if (!activeTabId) return;
-    const updated = memos.map(m => m.id === activeTabId ? { ...m, fontSizeIndex: index } : m);
-    setMemos(updated);
-    onUpdateMemos(updated);
+  const handleFontSize = (action: 'increase' | 'decrease') => {
+    // Attempt to determine current font size
+    let currentSize = 3; // Default (normally 16px or size 3)
+    const val = document.queryCommandValue('fontSize');
+    if (val) {
+        if (val.includes('px')) {
+             const px = parseInt(val);
+             // Approximate mapping for Chrome/Webkit
+             if (px <= 10) currentSize = 1;
+             else if (px <= 13) currentSize = 2;
+             else if (px <= 16) currentSize = 3;
+             else if (px <= 18) currentSize = 4;
+             else if (px <= 24) currentSize = 5;
+             else if (px <= 32) currentSize = 6;
+             else currentSize = 7;
+        } else {
+             currentSize = parseInt(val) || 3;
+        }
+    }
+    
+    let newSize = action === 'increase' ? currentSize + 1 : currentSize - 1;
+    if (newSize < 1) newSize = 1;
+    if (newSize > 7) newSize = 7;
+    
+    document.execCommand('fontSize', false, newSize.toString());
+    handleContentChange();
+    if (editorRef.current) editorRef.current.focus();
   };
 
   // Safe color application
@@ -268,6 +277,7 @@ const MemoView: React.FC<MemoViewProps> = ({ initialMemos, onUpdateMemos }) => {
                 {/* Formatting Tools */}
                 <div className="flex items-center gap-1 bg-stone-100/50 p-1 rounded-lg">
                     <button 
+                        onMouseDown={(e) => e.preventDefault()}
                         onClick={() => handleInsertCheckbox()}
                         className="p-1.5 text-stone-500 hover:bg-white hover:text-red-800 rounded transition"
                         title="插入核取方塊"
@@ -275,6 +285,7 @@ const MemoView: React.FC<MemoViewProps> = ({ initialMemos, onUpdateMemos }) => {
                         <CheckSquare size={16} />
                     </button>
                     <button 
+                        onMouseDown={(e) => e.preventDefault()}
                         onClick={() => handleExecCommand('insertUnorderedList')}
                         className="p-1.5 text-stone-500 hover:bg-white hover:text-stone-800 rounded transition"
                         title="項目符號清單"
@@ -282,6 +293,7 @@ const MemoView: React.FC<MemoViewProps> = ({ initialMemos, onUpdateMemos }) => {
                         <List size={16} />
                     </button>
                     <button 
+                        onMouseDown={(e) => e.preventDefault()}
                         onClick={() => handleExecCommand('insertOrderedList')}
                         className="p-1.5 text-stone-500 hover:bg-white hover:text-stone-800 rounded transition"
                         title="編號清單"
@@ -290,6 +302,7 @@ const MemoView: React.FC<MemoViewProps> = ({ initialMemos, onUpdateMemos }) => {
                     </button>
                     <div className="w-px h-4 bg-stone-200 mx-1"></div>
                     <button 
+                        onMouseDown={(e) => e.preventDefault()}
                         onClick={() => handleExecCommand('strikeThrough')}
                         className="p-1.5 text-stone-500 hover:bg-white hover:text-stone-800 rounded transition"
                         title="標示為完成 (刪除線)"
@@ -298,20 +311,22 @@ const MemoView: React.FC<MemoViewProps> = ({ initialMemos, onUpdateMemos }) => {
                     </button>
                 </div>
 
-                {/* Font Size */}
-                <div className="flex items-center gap-2 bg-stone-100/50 p-1 rounded-lg">
+                {/* Font Size - Individual Adjustment */}
+                <div className="flex items-center gap-1 bg-stone-100/50 p-1 rounded-lg">
                     <button 
-                        onClick={() => changeFontSize(Math.max(0, activeMemo.fontSizeIndex - 1))}
-                        disabled={activeMemo.fontSizeIndex === 0}
-                        className="p-1.5 text-stone-500 hover:bg-white rounded disabled:opacity-30 transition"
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => handleFontSize('decrease')}
+                        className="p-1.5 text-stone-500 hover:bg-white rounded transition"
+                        title="縮小字體 (選取文字)"
                     >
                         <Type size={12} />
                     </button>
-                    <span className="text-[11px] font-mono w-4 text-center text-stone-400">{activeMemo.fontSizeIndex + 1}</span>
+                    <div className="w-px h-3 bg-stone-200 mx-1"></div>
                     <button 
-                         onClick={() => changeFontSize(Math.min(FONT_SIZES.length - 1, activeMemo.fontSizeIndex + 1))}
-                         disabled={activeMemo.fontSizeIndex === FONT_SIZES.length - 1}
-                         className="p-1.5 text-stone-500 hover:bg-white rounded disabled:opacity-30 transition"
+                         onMouseDown={(e) => e.preventDefault()}
+                         onClick={() => handleFontSize('increase')}
+                         className="p-1.5 text-stone-500 hover:bg-white rounded transition"
+                         title="放大字體 (選取文字)"
                     >
                         <Type size={16} />
                     </button>
@@ -325,6 +340,7 @@ const MemoView: React.FC<MemoViewProps> = ({ initialMemos, onUpdateMemos }) => {
                     {HIGHLIGHT_COLORS.map((hl) => (
                         <button
                             key={hl.label}
+                            onMouseDown={(e) => e.preventDefault()}
                             onClick={() => applyHighlight(hl.color)}
                             className={`w-5 h-5 rounded-full border ${hl.border} shadow-sm hover:scale-110 transition-transform`}
                             style={{ backgroundColor: hl.color === 'transparent' ? '#ffffff' : hl.color }}
@@ -357,7 +373,7 @@ const MemoView: React.FC<MemoViewProps> = ({ initialMemos, onUpdateMemos }) => {
              }}
              className={`
                 w-full h-full outline-none p-8 md:p-10 overflow-y-auto custom-scrollbar
-                ${FONT_SIZES[activeMemo.fontSizeIndex]}
+                text-base
                 leading-relaxed text-stone-700
                 font-serif tracking-wide
                 selection:bg-red-100 selection:text-red-900
