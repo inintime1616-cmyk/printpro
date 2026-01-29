@@ -16,7 +16,15 @@ export interface Project {
   stages: Stage[];
 }
 
-export type ViewType = 'dashboard' | 'calendar' | 'workspace' | 'archived';
+export interface Memo {
+  id: string;
+  title: string;
+  content: string;
+  fontSizeIndex: number; // 0-9
+  updatedAt: number;
+}
+
+export type ViewType = 'dashboard' | 'calendar' | 'workspace' | 'archived' | 'memo';
 
 export interface DateStatus {
   text: string;

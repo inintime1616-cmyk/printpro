@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Project, ViewType } from './types';
+import { Project, ViewType, Memo } from './types';
 import Header from './components/Header';
 import Dashboard from './components/Dashboard';
 import CalendarView from './components/CalendarView';
 import WorkspaceView from './components/WorkspaceView';
 import ArchivedView from './components/ArchivedView';
 import ProjectModal from './components/ProjectModal';
+import MemoView from './components/MemoView';
 
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewType>('dashboard');
   const [projects, setProjects] = useState<Project[]>([]);
+  const [memos, setMemos] = useState<Memo[]>([]);
   const [appTitle, setAppTitle] = useState('PrintFlow Pro');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
@@ -45,6 +47,11 @@ const App: React.FC = () => {
       setTagColors(JSON.parse(savedTagColors));
     }
 
+    const savedMemos = localStorage.getItem('printProjectSystem_memos');
+    if (savedMemos) {
+      setMemos(JSON.parse(savedMemos));
+    }
+
     const savedTitle = localStorage.getItem('printProjectSystem_appTitle');
     if (savedTitle) {
       setAppTitle(savedTitle);
@@ -69,6 +76,11 @@ const App: React.FC = () => {
       localStorage.setItem('printProjectSystem_tagColors', JSON.stringify(tagColors));
     }
   }, [tagColors]);
+
+  useEffect(() => {
+    // We save memos even if empty to persist deletions
+    localStorage.setItem('printProjectSystem_memos', JSON.stringify(memos));
+  }, [memos]);
 
   useEffect(() => {
     localStorage.setItem('printProjectSystem_appTitle', appTitle);
@@ -144,6 +156,7 @@ const App: React.FC = () => {
       projects,
       availableTags,
       tagColors,
+      memos,
       appTitle,
       version: '1.0',
       timestamp: new Date().toISOString()
@@ -175,13 +188,16 @@ const App: React.FC = () => {
           return;
         }
 
-        if (window.confirm(`準備匯入包含 ${data.projects.length} 個專案的備份資料。\n\n⚠️ 注意：這將會「完全覆蓋」目前的現有資料！\n\n確定要繼續嗎？`)) {
+        if (window.confirm(`準備匯入備份資料。\n\n⚠️ 注意：這將會「完全覆蓋」目前的現有資料！\n\n確定要繼續嗎？`)) {
           setProjects(data.projects);
           if (Array.isArray(data.availableTags)) {
              setAvailableTags(data.availableTags);
           }
           if (data.tagColors) {
             setTagColors(data.tagColors);
+          }
+          if (Array.isArray(data.memos)) {
+            setMemos(data.memos);
           }
           if (data.appTitle) {
              setAppTitle(data.appTitle);
@@ -226,6 +242,9 @@ const App: React.FC = () => {
         )}
         {currentView === 'workspace' && (
           <WorkspaceView projects={projects} onEdit={openEditProject} tagColors={tagColors} />
+        )}
+        {currentView === 'memo' && (
+          <MemoView initialMemos={memos} onUpdateMemos={setMemos} />
         )}
         {currentView === 'archived' && (
           <ArchivedView 

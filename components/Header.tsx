@@ -1,6 +1,6 @@
 import React from 'react';
 import { ViewType } from '../types';
-import { Printer, Layers, CalendarDays, Hammer, Archive, Plus, Feather, Download, Upload } from 'lucide-react';
+import { Printer, Layers, CalendarDays, Hammer, Archive, Plus, Feather, Download, Upload, NotebookPen } from 'lucide-react';
 
 interface HeaderProps {
   currentView: ViewType;
@@ -23,6 +23,7 @@ const Header: React.FC<HeaderProps> = ({
 }) => {
   const navItems: { id: ViewType; label: string; icon: React.ReactNode }[] = [
     { id: 'dashboard', label: '進行中', icon: <Layers size={16} /> },
+    { id: 'memo', label: '備忘錄', icon: <NotebookPen size={16} /> },
     { id: 'calendar', label: '行事曆', icon: <CalendarDays size={16} /> },
     { id: 'workspace', label: '工藝區', icon: <Hammer size={16} /> },
     { id: 'archived', label: '歸檔庫', icon: <Archive size={16} /> },

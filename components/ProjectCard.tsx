@@ -40,7 +40,15 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onEdit, onArchive, o
     >
       {/* Header */}
       <div className="flex justify-between items-start mb-4">
-        <h3 className="text-lg font-bold text-stone-800 break-words w-9/12 leading-snug font-serif tracking-wide">{project.name}</h3>
+        <h3 className="text-lg font-bold text-stone-800 w-9/12 leading-snug font-serif tracking-wide flex items-start gap-2">
+          {project.notes && (
+            <span 
+              className="shrink-0 w-1.5 h-1.5 rounded-full bg-red-800/70 mt-2.5" 
+              title="有備註內容"
+            />
+          )}
+          <span className="break-words">{project.name}</span>
+        </h3>
         <div className="flex gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <button onClick={() => onEdit(project)} className="text-stone-400 hover:text-stone-700 p-1.5 rounded-full hover:bg-stone-100 transition">
             <Pen size={15} />
