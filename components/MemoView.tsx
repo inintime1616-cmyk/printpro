@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Memo } from '../types';
-import { Plus, X, Type, Highlighter, PenLine, Edit2, Check, Trash2 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Plus, X, Type, Highlighter, PenLine, Edit2, Check, Trash2, List, ListOrdered, CheckSquare, Strikethrough } from 'lucide-react';
+import { motion, AnimatePresence, Reorder } from 'framer-motion';
 
 interface MemoViewProps {
   initialMemos: Memo[];
@@ -117,6 +117,11 @@ const MemoView: React.FC<MemoViewProps> = ({ initialMemos, onUpdateMemos }) => {
     }
   };
 
+  const handleReorderTabs = (newOrder: Memo[]) => {
+    setMemos(newOrder);
+    onUpdateMemos(newOrder);
+  };
+
   const handleRename = () => {
     if (!activeTabId || !tempTitle.trim()) return;
     const updated = memos.map(m => m.id === activeTabId ? { ...m, title: tempTitle } : m);
@@ -133,6 +138,32 @@ const MemoView: React.FC<MemoViewProps> = ({ initialMemos, onUpdateMemos }) => {
     handleContentChange();
   };
 
+  const handleInsertCheckbox = () => {
+    // Insert a checkbox input
+    const checkboxHtml = '<input type="checkbox" style="vertical-align: middle; margin-right: 6px; transform: scale(1.2);" />&nbsp;';
+    document.execCommand('insertHTML', false, checkboxHtml);
+    if (editorRef.current) {
+        editorRef.current.focus();
+    }
+    handleContentChange();
+  };
+
+  // Handle clicking on checkboxes inside contentEditable to toggle their state attribute
+  // This is required because simply clicking a checkbox in contentEditable doesn't always update the DOM attribute for innerHTML
+  const handleEditorClick = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (target.tagName === 'INPUT' && target.getAttribute('type') === 'checkbox') {
+        const input = target as HTMLInputElement;
+        // We need to manually toggle the attribute so it saves to the HTML string correctly
+        if (input.checked) {
+            input.setAttribute('checked', 'true');
+        } else {
+            input.removeAttribute('checked');
+        }
+        handleContentChange();
+    }
+  };
+
   const changeFontSize = (index: number) => {
     if (!activeTabId) return;
     const updated = memos.map(m => m.id === activeTabId ? { ...m, fontSizeIndex: index } : m);
@@ -142,8 +173,6 @@ const MemoView: React.FC<MemoViewProps> = ({ initialMemos, onUpdateMemos }) => {
 
   // Safe color application
   const applyHighlight = (color: string) => {
-    // Note: 'hiliteColor' is technically deprecated but robustly supported for this specific use case across browsers
-    // compared to complex range manipulation which is buggy without a heavy library.
     document.execCommand('hiliteColor', false, color);
     handleContentChange();
   };
@@ -153,31 +182,42 @@ const MemoView: React.FC<MemoViewProps> = ({ initialMemos, onUpdateMemos }) => {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col h-[calc(100vh-140px)] gap-4">
       
-      {/* 1. Tabs Area */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar border-b border-stone-200">
-        {memos.map(memo => (
-          <div 
-            key={memo.id}
-            onClick={() => setActiveTabId(memo.id)}
-            className={`
-              group relative flex items-center gap-2 px-4 py-2.5 rounded-t-xl cursor-pointer transition-all duration-200 border-t border-x
-              ${activeTabId === memo.id 
-                ? 'bg-[#fdfbf9] border-stone-200 text-stone-800 shadow-[0_4px_0_#fdfbf9] translate-y-[1px] z-10' 
-                : 'bg-stone-100 border-transparent text-stone-400 hover:bg-stone-50 hover:text-stone-600'}
-            `}
-          >
-            <span className="max-w-[120px] truncate text-[13.5px] font-medium tracking-wide">
-              {memo.title}
-            </span>
-            {/* Delete Icon (Hover only, not for active if purely simplistic, but let's allow it) */}
-            <button 
-              onClick={(e) => handleDeleteTab(e, memo.id)}
-              className="opacity-0 group-hover:opacity-100 p-1 rounded-full hover:bg-stone-200 text-stone-400 hover:text-red-500 transition-all"
+      {/* 1. Tabs Area (Draggable) */}
+      <div className="flex items-center gap-1 overflow-x-auto pb-2 no-scrollbar border-b border-stone-200">
+        <Reorder.Group 
+            axis="x" 
+            values={memos} 
+            onReorder={handleReorderTabs} 
+            className="flex items-center gap-1"
+        >
+            {memos.map(memo => (
+            <Reorder.Item 
+                key={memo.id} 
+                value={memo}
+                className="relative"
             >
-              <X size={12} />
-            </button>
-          </div>
-        ))}
+                <div 
+                    onClick={() => setActiveTabId(memo.id)}
+                    className={`
+                    group relative flex items-center gap-2 px-4 py-2.5 rounded-t-xl cursor-pointer transition-all duration-200 border-t border-x select-none
+                    ${activeTabId === memo.id 
+                        ? 'bg-[#fdfbf9] border-stone-200 text-stone-800 shadow-[0_4px_0_#fdfbf9] translate-y-[1px] z-10' 
+                        : 'bg-stone-100 border-transparent text-stone-400 hover:bg-stone-50 hover:text-stone-600'}
+                    `}
+                >
+                    <span className="max-w-[120px] truncate text-[13.5px] font-medium tracking-wide">
+                    {memo.title}
+                    </span>
+                    <button 
+                    onClick={(e) => handleDeleteTab(e, memo.id)}
+                    className="opacity-0 group-hover:opacity-100 p-1 rounded-full hover:bg-stone-200 text-stone-400 hover:text-red-500 transition-all"
+                    >
+                    <X size={12} />
+                    </button>
+                </div>
+            </Reorder.Item>
+            ))}
+        </Reorder.Group>
         
         <button 
           onClick={handleAddTab}
@@ -223,8 +263,41 @@ const MemoView: React.FC<MemoViewProps> = ({ initialMemos, onUpdateMemos }) => {
             </div>
 
             {/* Right: Tools */}
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4">
                 
+                {/* Formatting Tools */}
+                <div className="flex items-center gap-1 bg-stone-100/50 p-1 rounded-lg">
+                    <button 
+                        onClick={() => handleInsertCheckbox()}
+                        className="p-1.5 text-stone-500 hover:bg-white hover:text-red-800 rounded transition"
+                        title="插入核取方塊"
+                    >
+                        <CheckSquare size={16} />
+                    </button>
+                    <button 
+                        onClick={() => handleExecCommand('insertUnorderedList')}
+                        className="p-1.5 text-stone-500 hover:bg-white hover:text-stone-800 rounded transition"
+                        title="項目符號清單"
+                    >
+                        <List size={16} />
+                    </button>
+                    <button 
+                        onClick={() => handleExecCommand('insertOrderedList')}
+                        className="p-1.5 text-stone-500 hover:bg-white hover:text-stone-800 rounded transition"
+                        title="編號清單"
+                    >
+                        <ListOrdered size={16} />
+                    </button>
+                    <div className="w-px h-4 bg-stone-200 mx-1"></div>
+                    <button 
+                        onClick={() => handleExecCommand('strikeThrough')}
+                        className="p-1.5 text-stone-500 hover:bg-white hover:text-stone-800 rounded transition"
+                        title="標示為完成 (刪除線)"
+                    >
+                        <Strikethrough size={16} />
+                    </button>
+                </div>
+
                 {/* Font Size */}
                 <div className="flex items-center gap-2 bg-stone-100/50 p-1 rounded-lg">
                     <button 
@@ -265,7 +338,13 @@ const MemoView: React.FC<MemoViewProps> = ({ initialMemos, onUpdateMemos }) => {
         </div>
 
         {/* Editor Area */}
-        <div className="flex-1 overflow-hidden relative group cursor-text" onClick={() => editorRef.current?.focus()}>
+        <div 
+            className="flex-1 overflow-hidden relative group cursor-text" 
+            onClick={(e) => {
+                handleEditorClick(e);
+                editorRef.current?.focus();
+            }}
+        >
            <div 
              ref={editorRef}
              contentEditable
