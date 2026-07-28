@@ -27,8 +27,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onEdit, onArchive, o
     if (projectStatus === '已完成') return 'border-l-emerald-600';
     if (!project.deadline) return 'border-l-stone-300';
     const diff = getDiffDays(project.deadline);
-    if (diff <= 1) return 'border-l-rose-500'; // 當天或過期：溫和紅
-    if (diff <= 3) return 'border-l-orange-500'; // 2-3天：溫暖橘
+    if (diff <= 0) return 'border-l-rose-500'; // 當天或過期：溫和紅
+    if (diff <= 3) return 'border-l-orange-500'; // 1-3天：溫暖橘
     if (diff <= 6) return 'border-l-amber-400'; // 4-6天：溫和橘黃
     return 'border-l-emerald-500'; // 7天以上：綠色
   };
@@ -104,7 +104,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onEdit, onArchive, o
           let isStageUrgent = false;
 
           if (!stage.completed && stageDiff !== null) {
-            if (stageDiff <= 1) {
+            if (stageDiff <= 0) {
               stageColorClass = 'text-rose-600 font-bold animate-pulse';
               isStageUrgent = true;
             } else if (stageDiff <= 3) {

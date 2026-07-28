@@ -31,9 +31,9 @@ export const getDeadlineStatus = (deadline: string): DateStatus => {
       isOverdue: true
     };
   }
-  if (diff <= 1) {
+  if (diff === 0) {
     return { 
-      text: diff === 0 ? '⚠️ 今日截止 (0天)' : `⚠️ 明日截止 (1天)`, 
+      text: '⚠️ 今日截止 (0天)', 
       colorClass: 'bg-rose-50 text-rose-800 border-rose-300 animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite] font-medium shadow-sm',
       isUrgent: true,
       isOverdue: false

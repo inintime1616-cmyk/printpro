@@ -38,7 +38,7 @@ const WorkspaceView: React.FC<WorkspaceViewProps> = ({ projects, onEdit, tagColo
     if (!deadline) return 'text-stone-400';
     const diff = getDiffDays(deadline);
     if (diff < 0) return 'text-rose-600 font-bold animate-pulse line-through';
-    if (diff <= 1) return 'text-rose-600 font-bold animate-pulse';
+    if (diff === 0) return 'text-rose-600 font-bold animate-pulse';
     if (diff <= 3) return 'text-orange-600 font-bold';
     if (diff <= 6) return 'text-amber-600 font-medium';
     return 'text-emerald-600 font-medium';
