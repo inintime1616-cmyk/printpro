@@ -12,35 +12,52 @@ export const getDiffDays = (deadline: string): number => {
 };
 
 export const getDeadlineStatus = (deadline: string): DateStatus => {
+  if (!deadline) {
+    return { 
+      text: '未設定日期', 
+      colorClass: 'bg-stone-50 text-stone-500 border-stone-200',
+      isUrgent: false,
+      isOverdue: false
+    };
+  }
+
   const diff = getDiffDays(deadline);
   
   if (diff < 0) {
     return { 
-      text: '⚠️ 已逾期', 
-      colorClass: 'bg-red-700 text-white border-red-800 font-bold shadow-md', // Striking alert style
+      text: `⚠️ 已逾期 (${Math.abs(diff)}天)`, 
+      colorClass: 'bg-rose-50 text-rose-800 border-rose-300 animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite] font-medium shadow-sm',
       isUrgent: true,
       isOverdue: true
+    };
+  }
+  if (diff <= 1) {
+    return { 
+      text: diff === 0 ? '⚠️ 今日截止 (0天)' : `⚠️ 明日截止 (1天)`, 
+      colorClass: 'bg-rose-50 text-rose-800 border-rose-300 animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite] font-medium shadow-sm',
+      isUrgent: true,
+      isOverdue: false
     };
   }
   if (diff <= 3) {
     return { 
       text: `急迫 (${diff}天)`, 
-      colorClass: 'bg-red-50 text-red-700 border-red-200 font-medium',
+      colorClass: 'bg-orange-50 text-orange-800 border-orange-300 font-medium',
       isUrgent: true,
       isOverdue: false
     };
   }
-  if (diff <= 7) {
+  if (diff <= 6) {
     return { 
       text: `留意 (${diff}天)`, 
-      colorClass: 'bg-orange-50 text-orange-700 border-orange-200',
+      colorClass: 'bg-amber-50 text-amber-800 border-amber-300 font-medium',
       isUrgent: false,
       isOverdue: false
     };
   }
   return { 
     text: `正常 (${diff}天)`, 
-    colorClass: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    colorClass: 'bg-emerald-50 text-emerald-800 border-emerald-300 font-medium',
     isUrgent: false,
     isOverdue: false
   };

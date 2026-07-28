@@ -25,9 +25,12 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onEdit, onArchive, o
 
   const getBorderColor = () => {
     if (projectStatus === '已完成') return 'border-l-emerald-600';
-    if (statusInfo.isOverdue) return 'border-l-red-700'; // Dark red for overdue
-    if (statusInfo.isUrgent) return 'border-l-red-600';
-    return 'border-l-stone-300'; // Neutral default
+    if (!project.deadline) return 'border-l-stone-300';
+    const diff = getDiffDays(project.deadline);
+    if (diff <= 1) return 'border-l-rose-500'; // 當天或過期：溫和紅
+    if (diff <= 3) return 'border-l-orange-500'; // 2-3天：溫暖橘
+    if (diff <= 6) return 'border-l-amber-400'; // 4-6天：溫和橘黃
+    return 'border-l-emerald-500'; // 7天以上：綠色
   };
 
   return (
@@ -72,9 +75,9 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onEdit, onArchive, o
       </div>
 
       {/* Status Box */}
-      <div className={`mb-5 px-3 py-2 rounded border-l-2 ${statusInfo.isOverdue ? statusInfo.colorClass : statusInfo.colorClass.replace('bg-', 'bg-opacity-40 ')} flex items-center justify-between`}>
+      <div className={`mb-5 px-3 py-2 rounded-lg border border-l-4 ${statusInfo.colorClass} flex items-center justify-between transition-all duration-300`}>
         <div className="text-[13.5px] font-medium flex items-center opacity-90">
-          <Clock size={14} className="mr-2" />
+          <Clock size={14} className="mr-2 shrink-0" />
           <span className="tracking-wider">{project.deadline}</span>
         </div>
         <div className="text-[13.5px] font-bold">{statusInfo.text}</div>
@@ -96,7 +99,23 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onEdit, onArchive, o
       {/* Stages */}
       <div className="space-y-1.5 mb-5">
         {project.stages.map((stage, idx) => {
-          const isUrgent = !stage.completed && stage.deadline && getDiffDays(stage.deadline) <= 3;
+          const stageDiff = stage.deadline ? getDiffDays(stage.deadline) : null;
+          let stageColorClass = 'text-stone-300';
+          let isStageUrgent = false;
+
+          if (!stage.completed && stageDiff !== null) {
+            if (stageDiff <= 1) {
+              stageColorClass = 'text-rose-600 font-bold animate-pulse';
+              isStageUrgent = true;
+            } else if (stageDiff <= 3) {
+              stageColorClass = 'text-orange-600 font-bold';
+              isStageUrgent = true;
+            } else if (stageDiff <= 6) {
+              stageColorClass = 'text-amber-600 font-medium';
+            } else {
+              stageColorClass = 'text-emerald-600 font-medium';
+            }
+          }
           
           return (
             <div key={idx} className="flex items-start justify-between py-1 group/stage">
@@ -115,8 +134,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onEdit, onArchive, o
                 </span>
               </label>
               
-              <div className={`text-[13.5px] whitespace-nowrap flex items-center justify-end w-4/12 ${isUrgent ? 'text-red-600 font-bold' : 'text-stone-300'}`}>
-                {isUrgent && <AlertCircle size={12} className="mr-1 fill-red-50" />}
+              <div className={`text-[13.5px] whitespace-nowrap flex items-center justify-end w-4/12 ${stage.completed ? 'text-stone-300' : stageColorClass}`}>
+                {isStageUrgent && <AlertCircle size={12} className="mr-1 fill-rose-50 text-rose-600" />}
                 {stage.deadline}
               </div>
             </div>
