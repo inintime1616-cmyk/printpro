@@ -24,7 +24,18 @@ export interface Memo {
   updatedAt: number;
 }
 
-export type ViewType = 'dashboard' | 'calendar' | 'workspace' | 'archived' | 'memo';
+export type ViewType = 'dashboard' | 'calendar' | 'workspace' | 'archived' | 'memo' | 'gantt';
+
+export interface CraftSchedule {
+  id: string;
+  craftName: string;
+  projectId: number;
+  startDate: string; // YYYY-MM-DD
+  endDate: string;   // YYYY-MM-DD
+  priority?: '高' | '中' | '低';
+  notes?: string;
+  createdAt: number;
+}
 
 export interface DateStatus {
   text: string;

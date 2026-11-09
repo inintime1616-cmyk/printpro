@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Project, ViewType, Memo } from './types';
+import { Project, ViewType, Memo, CraftSchedule } from './types';
 import Header from './components/Header';
 import Dashboard from './components/Dashboard';
 import CalendarView from './components/CalendarView';
@@ -7,10 +7,12 @@ import WorkspaceView from './components/WorkspaceView';
 import ArchivedView from './components/ArchivedView';
 import ProjectModal from './components/ProjectModal';
 import MemoView from './components/MemoView';
+import GanttView from './components/GanttView';
 
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewType>('dashboard');
   const [projects, setProjects] = useState<Project[]>([]);
+  const [craftSchedules, setCraftSchedules] = useState<CraftSchedule[]>([]);
   const [memos, setMemos] = useState<Memo[]>([]);
   const [appTitle, setAppTitle] = useState('PrintFlow Pro');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -33,6 +35,27 @@ const App: React.FC = () => {
         archived: false,
         stages: [{ name: '設計完稿', deadline: '2023-10-01', completed: true }, { name: '打樣確認', deadline: '', completed: false }]
       }]);
+    }
+
+    const savedSchedules = localStorage.getItem('printProjectSystem_craftSchedules');
+    if (savedSchedules) {
+      setCraftSchedules(JSON.parse(savedSchedules));
+    } else {
+      // Default sample schedule linked to initial project if available
+      const now = new Date();
+      const startStr = now.toISOString().split('T')[0];
+      const endStr = new Date(now.getTime() + 86400000 * 3).toISOString().split('T')[0];
+      setCraftSchedules([
+        {
+          id: 'gantt_init_1',
+          craftName: '燙金',
+          projectId: Date.now(), // matches default initial project id if newly initialized
+          startDate: startStr,
+          endDate: endStr,
+          notes: '打樣霧金確認',
+          createdAt: Date.now()
+        }
+      ]);
     }
 
     const savedTags = localStorage.getItem('printProjectSystem_allTags');
@@ -83,8 +106,29 @@ const App: React.FC = () => {
   }, [memos]);
 
   useEffect(() => {
+    localStorage.setItem('printProjectSystem_craftSchedules', JSON.stringify(craftSchedules));
+  }, [craftSchedules]);
+
+  useEffect(() => {
     localStorage.setItem('printProjectSystem_appTitle', appTitle);
   }, [appTitle]);
+
+  const handleAddCraftSchedule = (scheduleData: Omit<CraftSchedule, 'id' | 'createdAt'>) => {
+    const newSchedule: CraftSchedule = {
+      ...scheduleData,
+      id: `gantt_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+      createdAt: Date.now()
+    };
+    setCraftSchedules(prev => [...prev, newSchedule]);
+  };
+
+  const handleUpdateCraftSchedule = (updatedSchedule: CraftSchedule) => {
+    setCraftSchedules(prev => prev.map(s => s.id === updatedSchedule.id ? updatedSchedule : s));
+  };
+
+  const handleDeleteCraftSchedule = (id: string) => {
+    setCraftSchedules(prev => prev.filter(s => s.id !== id));
+  };
 
   const handleSaveProject = (projectData: Partial<Project>) => {
     if (editingProject) {
@@ -146,6 +190,13 @@ const App: React.FC = () => {
      }
   };
 
+  const handleDeleteCraft = (craft: string) => {
+    if (window.confirm(`確定要刪除「${craft}」工藝分類嗎？\n（該工藝之排程項目亦將同步刪除）`)) {
+      setAvailableTags(prev => prev.filter(t => t !== craft));
+      setCraftSchedules(prev => prev.filter(s => s.craftName !== craft));
+    }
+  };
+
   const handleClearArchived = () => {
     setProjects(prev => prev.filter(p => !p.archived));
   };
@@ -154,11 +205,12 @@ const App: React.FC = () => {
   const handleExportData = () => {
     const data = {
       projects,
+      craftSchedules,
       availableTags,
       tagColors,
       memos,
       appTitle,
-      version: '1.0',
+      version: '1.1',
       timestamp: new Date().toISOString()
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -190,6 +242,9 @@ const App: React.FC = () => {
 
         if (window.confirm(`準備匯入備份資料。\n\n⚠️ 注意：這將會「完全覆蓋」目前的現有資料！\n\n確定要繼續嗎？`)) {
           setProjects(data.projects);
+          if (Array.isArray(data.craftSchedules)) {
+            setCraftSchedules(data.craftSchedules);
+          }
           if (Array.isArray(data.availableTags)) {
              setAvailableTags(data.availableTags);
           }
@@ -242,6 +297,20 @@ const App: React.FC = () => {
         )}
         {currentView === 'workspace' && (
           <WorkspaceView projects={projects} onEdit={openEditProject} tagColors={tagColors} />
+        )}
+        {currentView === 'gantt' && (
+          <GanttView 
+            projects={projects}
+            craftSchedules={craftSchedules}
+            availableCrafts={availableTags}
+            tagColors={tagColors}
+            onAddSchedule={handleAddCraftSchedule}
+            onUpdateSchedule={handleUpdateCraftSchedule}
+            onDeleteSchedule={handleDeleteCraftSchedule}
+            onAddCraft={handleAddGlobalTag}
+            onDeleteCraft={handleDeleteCraft}
+            onEditProject={openEditProject}
+          />
         )}
         {currentView === 'memo' && (
           <MemoView initialMemos={memos} onUpdateMemos={setMemos} />
