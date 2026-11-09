@@ -18,6 +18,7 @@ const App: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [availableTags, setAvailableTags] = useState<string[]>([]);
+  const [craftCategories, setCraftCategories] = useState<string[]>([]);
   const [tagColors, setTagColors] = useState<Record<string, string>>({});
 
   // Load data
@@ -65,6 +66,13 @@ const App: React.FC = () => {
       setAvailableTags(['數位印刷', '燙金', '凸版', 'UV 浮雕', '斬型', '後加工']);
     }
 
+    const savedCraftCategories = localStorage.getItem('printProjectSystem_craftCategories');
+    if (savedCraftCategories) {
+      setCraftCategories(JSON.parse(savedCraftCategories));
+    } else {
+      setCraftCategories(['數位印刷', '燙金', '凸版', 'UV 浮雕', '斬型', '後加工']);
+    }
+
     const savedTagColors = localStorage.getItem('printProjectSystem_tagColors');
     if (savedTagColors) {
       setTagColors(JSON.parse(savedTagColors));
@@ -93,6 +101,12 @@ const App: React.FC = () => {
       localStorage.setItem('printProjectSystem_allTags', JSON.stringify(availableTags));
     }
   }, [availableTags]);
+
+  useEffect(() => {
+    if (craftCategories.length > 0) {
+      localStorage.setItem('printProjectSystem_craftCategories', JSON.stringify(craftCategories));
+    }
+  }, [craftCategories]);
 
   useEffect(() => {
     if (Object.keys(tagColors).length > 0) {
@@ -190,9 +204,16 @@ const App: React.FC = () => {
      }
   };
 
+  const handleAddCraft = (craft: string) => {
+    const trimmed = craft.trim();
+    if (trimmed && !craftCategories.includes(trimmed)) {
+      setCraftCategories(prev => [...prev, trimmed]);
+    }
+  };
+
   const handleDeleteCraft = (craft: string) => {
-    if (window.confirm(`確定要刪除「${craft}」工藝分類嗎？\n（該工藝之排程項目亦將同步刪除）`)) {
-      setAvailableTags(prev => prev.filter(t => t !== craft));
+    if (window.confirm(`確定要刪除「${craft}」工藝分類嗎？\n（該工藝之排程項目亦將同步刪除，卡片標籤不受影響）`)) {
+      setCraftCategories(prev => prev.filter(c => c !== craft));
       setCraftSchedules(prev => prev.filter(s => s.craftName !== craft));
     }
   };
@@ -206,11 +227,12 @@ const App: React.FC = () => {
     const data = {
       projects,
       craftSchedules,
+      craftCategories,
       availableTags,
       tagColors,
       memos,
       appTitle,
-      version: '1.1',
+      version: '1.2',
       timestamp: new Date().toISOString()
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -244,6 +266,11 @@ const App: React.FC = () => {
           setProjects(data.projects);
           if (Array.isArray(data.craftSchedules)) {
             setCraftSchedules(data.craftSchedules);
+          }
+          if (Array.isArray(data.craftCategories)) {
+            setCraftCategories(data.craftCategories);
+          } else if (Array.isArray(data.availableTags)) {
+            setCraftCategories(data.availableTags);
           }
           if (Array.isArray(data.availableTags)) {
              setAvailableTags(data.availableTags);
@@ -302,12 +329,12 @@ const App: React.FC = () => {
           <GanttView 
             projects={projects}
             craftSchedules={craftSchedules}
-            availableCrafts={availableTags}
+            availableCrafts={craftCategories}
             tagColors={tagColors}
             onAddSchedule={handleAddCraftSchedule}
             onUpdateSchedule={handleUpdateCraftSchedule}
             onDeleteSchedule={handleDeleteCraftSchedule}
-            onAddCraft={handleAddGlobalTag}
+            onAddCraft={handleAddCraft}
             onDeleteCraft={handleDeleteCraft}
             onEditProject={openEditProject}
           />

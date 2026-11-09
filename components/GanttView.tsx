@@ -182,9 +182,8 @@ const GanttView: React.FC<GanttViewProps> = ({
 
   // All distinct crafts list
   const allCraftsList = useMemo(() => {
-    const set = new Set<string>([...availableCrafts, ...craftSchedules.map(s => s.craftName)]);
-    return Array.from(set).filter(Boolean);
-  }, [availableCrafts, craftSchedules]);
+    return Array.from(new Set(availableCrafts)).filter(Boolean);
+  }, [availableCrafts]);
 
   // Filtered schedules based on craft and search query
   const filteredSchedules = useMemo(() => {
